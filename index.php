@@ -16,10 +16,9 @@
 <div id="container">
 	<div id="navigation">
 		<ul>
-		<li><a href="#">Home</a></li>
-		<li><a href="#">About Us</a></li>
-		<li><a href="#">Our Products</a></li>
-		<li><a href="#">Contact Us</a></li>
+		<li><a href="index.php">Home</a></li>
+		<li><a href="http://guidetodatamining.com">Guide to Data Mining</a></li>
+		
 		</ul>
 	</div>
 		<div id="header">
@@ -28,7 +27,7 @@
 		</div>
 				<div id="wrapper">
 				<div id="content">
-					<h1>Welcome to Lemonaid</h1>
+					<h1>Welcome</h1>
 					
 					
 					<form method="post" action="analyze.php">
