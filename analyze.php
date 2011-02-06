@@ -214,8 +214,8 @@ function deletePun($word){
 
 
 if (isset($_GET['ex'])) {
-    $server = 'http://localhost/ngramAnalyzer';
-    #$server = 'http://guidetodatamining.com/ngramAnalyzer';
+    #$server = 'http://localhost/ngramAnalyzer';
+    $server = 'http://guidetodatamining.com/ngramAnalyzer';
     $text = $_GET['ex'];
     if ($text== 'walden'){
     	
