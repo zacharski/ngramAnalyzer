@@ -211,11 +211,15 @@ function deletePun($word){
   ###    M A I N
  ###
 ### 
+
+
 if (isset($_GET['ex'])) {
+    $server = 'http://localhost/ngramAnalyzer';
+    #$server = 'http://guidetodatamining.com/ngramAnalyzer';
     $text = $_GET['ex'];
     if ($text== 'walden'){
     	
-    	$thetext = "http://localhost/ngramAnalyzer/walden.txt";
+    	$thetext = "$server/walden.txt";
     	$cutoff = 3;
     	$n = 2;
     	$punc = 'no';
@@ -223,7 +227,7 @@ if (isset($_GET['ex'])) {
     }
     elseif ($text == 'moby'){
     	
-    	$thetext = "http://localhost/ngramAnalyzer/moby.txt";
+    	$thetext = "$server/moby.txt";
     	$cutoff = 3;
     	$n = 2;
     	$punc = 'no';
@@ -232,7 +236,7 @@ if (isset($_GET['ex'])) {
     }
     elseif ($text == 'moby2'){
     	
-    	$thetext = "http://localhost/ngramAnalyzer/moby.txt";
+    	$thetext = "$server/moby.txt";
     	$cutoff = 3;
     	$n = 2;
     	$punc = 'no';
@@ -241,7 +245,7 @@ if (isset($_GET['ex'])) {
     }
     elseif ($text == 'moby3'){
     	
-    	$thetext = "http://localhost/ngramAnalyzer/moby.txt";
+    	$thetext = "$server/moby.txt";
     	$cutoff = 3;
     	$n = 3;
     	$punc = 'no';
@@ -249,7 +253,7 @@ if (isset($_GET['ex'])) {
     }
     elseif ($text == 'super'){
     	
-    	$thetext = "http://localhost/ngramAnalyzer/miserables.txt";
+    	$thetext = "$server/miserables.txt";
     	$cutoff = 3;
     	$n = 2;
     	$punc = 'no';
@@ -258,7 +262,7 @@ if (isset($_GET['ex'])) {
     }
     elseif ($text == 'super2'){
     	
-    	$thetext = "http://localhost/ngramAnalyzer/miserables.txt";
+    	$thetext = "$server/miserables.txt";
     	$cutoff = 3;
     	$n = 3;
     	$punc = 'no';
