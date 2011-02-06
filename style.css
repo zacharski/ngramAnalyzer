@@ -90,11 +90,27 @@ div#container {
 text-align:left
 }
 
+div#option {
+	color: #b02c20;
+	font-weight: bold;
+}
+
+
 div#content p, div#extra p, td,  div#sidebar p {
 font-family: "Lucida Grande", Tahoma, Arial, Helvetica, sans-serif;
 font-size: 11px;
 color: #444;
 line-height:1.8em;
+}
+
+td.controls{
+	width: 50px;
+	color: #9900CC;
+
+}
+
+b{
+    color: #b02c20;
 }
 
 td{

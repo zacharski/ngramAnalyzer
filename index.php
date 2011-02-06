@@ -34,7 +34,9 @@
 				
 				<p>
     <textarea id="mytext" name="mytext" cols="70" rows="20" placeholder="Enter your text here or type in URLs one per line."></textarea><br /></p>
-    <p>Show 
+    
+    
+    <p><input type ="radio" name="method" checked="checked" value="byFreq" /><b>Using Frequency</b>: Show 
     
     <select name="gram" id="gram">
     <option value="1">unigrams</option>
@@ -60,7 +62,12 @@
      times. &nbsp; 
     
     
-    <input type="submit" value="Submit" /> </p>
+   </p>
+    <p><input type ="radio" name="method" value="LogLike" /><b>Using Log Likelihood</b>: Show bigram collocations</p>
+    <p><input type ="checkbox" name="punctuation" value="checked" /><b>Treat punctuation as separate tokens</b></p>
+    <p> <input type="submit" value="Submit" /> </p>
+    
+    
 				</form>
 					
 					</div>
