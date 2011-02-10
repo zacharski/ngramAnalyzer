@@ -107,54 +107,51 @@ function deletePun($word){
   
   }
   
-  
-
-  function processLine($line){
-       global $ngrams;
-       global $previous;
-       global $n;
-       global $total;
+   function processLine2($line){
+       global $uni2;
+       global $total2;
        global $unigrams;
-       global $punc;
   	   $words = preg_split('/\s+/', $line);
   	   #$ngrams = array();
        foreach($words as $word){
-         if ($punc == 'checked'){
-    	    $wordcomponents = separatePun($word);
-    	 }
-    	 else {
-    	 	$wordcomponents = deletePun($word);
-    	 }
+    	 $wordcomponents = deletePun($word);
+    	 
     	 #$current = $word;
     	 foreach($wordcomponents as $current){
     	      #echo "X$current ";
-    	      if (isset($unigrams[$current])){
-    	          $unigrams[$current] = $unigrams[$current] + 1;
+    	      $total2 = $total2 + 1;
+    	      if (isset($uni2[$current])){
+    	          $uni2[$current] = $uni2[$current] + 1;
     	      }
     	      else {
-    	         $unigrams[$current] = 1;
+    	         $uni2[$current] = 1;
     	      }
-    	      $gram = '';
-    	      $total++;
-    	      for($i = $n - 2; $i >= 0; $i--){
-    	            $gram = "$gram$previous[$i] ";
-    	      }
-    	      $gram = "$gram$current";
-    	      #$ngrams[$gram] = 1;
-    	      #if (array_key_exists($gram, $ngrams))
-    	      if (isset($ngrams[$gram]))
-    	      {
-    	          $ngrams[$gram] = $ngrams[$gram] + 1;
+    	    
+    	 }
+       }
+  
+  }
+ 
+
+  function processLine($line){
+       global $uni1;
+       global $total;
+       global $unigrams;
+  	   $words = preg_split('/\s+/', $line);
+  	   #$ngrams = array();
+       foreach($words as $word){
+    	 $wordcomponents = deletePun($word);
+    	 
+    	 #$current = $word;
+    	 foreach($wordcomponents as $current){
+    	      #echo "X$current ";
+    	      $total = $total + 1;
+    	      if (isset($uni1[$current])){
+    	          $uni1[$current] = $uni1[$current] + 1;
     	      }
     	      else {
-    	         $ngrams[$gram] = 1;
-    	      #   #echo "...";
+    	         $uni1[$current] = 1;
     	      }
-    	      $previous[4] = $previous[3];
-    	      $previous[3] = $previous[2];
-    	      $previous[2] = $previous[1];
-    	      $previous[1] = $previous[0];
-    	      $previous[0] = $current;
     	    
     	 }
        }
@@ -165,13 +162,11 @@ function deletePun($word){
     ###   BY FREQUENCY
    ###
    function byFrequency(){
-       global $ngrams;
-       global $unigrams;
-       global $previous;
-       global $n;
+       
+       global $uni1;
        global $total;
        global $thetext;
-       global $cutoff;
+       
   	   if (is_array($thetext) == true)
        {
   	       foreach($thetext as $aline){
@@ -192,6 +187,34 @@ function deletePun($word){
   
    }
    
+     ###
+    ###   BY FREQUENCY
+   ###
+   function byFrequency2(){
+       
+       global $uni2;
+       global $total2;
+       global $reference;
+       
+  	   if (is_array($reference) == true)
+       {
+  	       foreach($reference as $aline){
+    	      processLine2($aline);
+           }
+       }
+       else {
+          if (substr($reference, 0, 4) == 'http') {
+      		 $urls = preg_split('/\s+/', $reference);
+      		 foreach($urls as $url){
+      	    	processLine2(file_get_contents($url));
+      	     }
+          }
+          else{
+      	     processLine2($thetext);
+          }
+       }
+  
+   }
    
       ###
      ###  USING LOG LIKELIHOOD
@@ -215,20 +238,29 @@ function deletePun($word){
 
 $thetext = $_POST['mytext'];
 $reference = $_POST['reference'];
+$total2 = 0;
 ##########
 ##  I am editing here
 ####
    $n = $_POST['gram'];
    $punc = $_POST['punctuation'];
    $method = $_POST['method'] ;
-}
+
 #echo $thetext;
-$ngrams = array();
-$previous = array('', '', '', '');
-   $total = 0;
-if ($method == 'byFreq'){
-  byFrequency();
-  $len = count($ngrams);
+$uni1 = array();
+$uni2 = array();
+$total = 0;
+byFrequency();
+byFrequency2();
+  $len1 = count($uni1);
+  $len2 = count($uni2);
+  
+  echo "<p>LEN $len1 $len2</p>";
+  echo "<p>TOTAL $total $total2</p>";
+  echo "<p>the ".$uni1['the'].'     '.$uni2['the']."</p>";
+  echo "<p>Buddha ".$uni1['Buddha'].'     '.$uni2['Buddha']."</p>";
+  echo "<p>Compassion ".$uni1['compassion'].'     '.$uni2['compassion']."</p>";
+  echo "<p>".ll($uni1['compassion'],$uni2['compassion'], $total1, $total2)."</p>";
   echo "<p>Total number of tokens: $total   &nbsp;&nbsp;&nbsp; Types: $len</p>";
   arsort($ngrams, SORT_NUMERIC);
   echo "<table><tr><th>ngram</th><th>count</th><th>frequency</th></tr>\n";
@@ -244,34 +276,7 @@ if ($method == 'byFreq'){
       
        echo "</table>";
  
-} 
-else{
-	$n = 2;
-	byFrequency();
-	$LOGGER = array();
-	#echo "<p>OKAY BEFORE ARSORT</p>";
-	arsort($ngrams, SORT_NUMERIC);
-	foreach($ngrams as $gram=>$count){
-	   if ($count < 3){
-            break;
-       }	
-	   $words = preg_split('/\s+/', $gram);
-	   #echo "<p>$words[1], $words[0], $gram</p>";
-	   $LOGGER[$gram] = ll($unigrams[$words[1]], $unigrams[$words[0]], $count, $total);
-	}
-	#echo "<p>$LOG</p>";
-	
-	arsort($LOGGER, SORT_NUMERIC);
-	echo "<table><tr><th>bigram</th><th>count</th><th>Log Likelihood</th></tr>\n";
-    foreach($LOGGER as $gram =>$log){
-    	  $count = $ngrams[$gram];
-          echo "<tr><td>$gram</td><td>$count</td><td>$log</td></tr>\n";
-       
-       }
-    echo "</table>";
 
-    
-}
 
  
 

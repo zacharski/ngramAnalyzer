@@ -30,7 +30,7 @@
 					<h1>Compare the words in this text:</h1>
 					
 					
-					<form method="post" action="analyze.php">
+					<form method="post" action="comparator2.php">
 				
 				<p>
     <textarea id="mytext" name="mytext" cols="70" rows="20" placeholder="Enter your text here or type in URLs one per line."></textarea><br /></p>
