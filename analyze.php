@@ -27,7 +27,7 @@
 		</div>
 				<div id="wrapper">
 				<div id="content">
-					<h1>Analysis Complete</h1>
+					
 					
 		
     
@@ -45,6 +45,7 @@
         #####
        #####
 
+include('loglikelihood.php');
 
 $ngrams = array();
 #$ngrams['fo42haj'] = 0;
@@ -234,6 +235,33 @@ if (isset($_GET['ex'])) {
     	$method = 'logLikelihood';
     
     }
+    elseif ($text == 'lotus'){
+    	
+    	$thetext = "$server/lotus.txt";
+    	$cutoff = 3;
+    	$n = 1;
+    	$punc = 'no';
+    	$method = 'byFreq';
+    
+    }
+    elseif ($text == 'lotus2'){
+    	
+    	$thetext = "$server/lotus.txt";
+    	$cutoff = 3;
+    	$n = 2;
+    	$punc = 'no';
+    	$method = 'byFreq';
+    
+    }
+    elseif ($text == 'lotus3'){
+    	
+    	$thetext = "$server/lotus.txt";
+    	$cutoff = 3;
+    	$n = 2;
+    	$punc = 'no';
+    	$method = 'loglikelihood';
+    
+    }
     elseif ($text == 'moby2'){
     	
     	$thetext = "$server/moby.txt";
@@ -284,7 +312,9 @@ $previous = array('', '', '', '');
    $total = 0;
 if ($method == 'byFreq'){
   byFrequency();
-  echo "<p>Total number of tokens: $total</p>";
+  $len = count($ngrams);
+  echo "<h1>Ngrams Ranked by Frequency</h1>";
+  echo "<p>Total number of tokens: $total   &nbsp;&nbsp;&nbsp; Types: $len</p>";
   arsort($ngrams, SORT_NUMERIC);
   echo "<table><tr><th>ngram</th><th>count</th><th>frequency</th></tr>\n";
   foreach($ngrams as $gram =>$count){
@@ -306,17 +336,27 @@ else{
 	$LOGGER = array();
 	#echo "<p>OKAY BEFORE ARSORT</p>";
 	arsort($ngrams, SORT_NUMERIC);
-	foreach($ngrams as $gram=>$count){
-	   if ($count < 3){
+	$len = count($ngrams);
+	#echo "<p>$len</p>";
+	foreach($ngrams as $gram=>$k11){
+	   if ($k11 < 3){
             break;
        }	
 	   $words = preg_split('/\s+/', $gram);
 	   #echo "<p>$words[1], $words[0], $gram</p>";
-	   $LOGGER[$gram] = ll($unigrams[$words[1]], $unigrams[$words[0]], $count, $total);
+	   $k12 = $unigrams[$words[1]] - $k11;
+	   $k21 = $unigrams[$words[0]] - $k11;
+	   $k22 = $total + $k11 - $k12 - $k21;
+	   $LOGGER[$gram] = logLikelihoodRatio($k11, $k12, $k21, $k22);
+	   #$LOGGER[$gram] = ll($unigrams[$words[1]], $unigrams[$words[0]], $count, $total);
 	}
 	#echo "<p>$LOG</p>";
 	
 	arsort($LOGGER, SORT_NUMERIC);
+	#$len = count($LOGGER);
+	#echo "<p>$len</p>";;
+	echo "<h1>Ngrams Ranked by Log Likelihood</h1>";
+	echo "<p>Total number of tokens: $total   &nbsp;&nbsp;&nbsp; Types: $len</p>";
 	echo "<table><tr><th>bigram</th><th>count</th><th>Log Likelihood</th></tr>\n";
     foreach($LOGGER as $gram =>$log){
     	  $count = $ngrams[$gram];

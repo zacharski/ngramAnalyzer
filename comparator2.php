@@ -225,9 +225,29 @@ function deletePun($word){
       
       $e2 = $total * ($w1w2 + $w2) / ($w1 + $total);
       #echo"<p>E1: $e1</p><p>E2: $e2</p>";
-      $g2 = 2 * (($w1w2 * log(($w1w2 / $e1), 2)) + ($w2 * log(($w2 / $e2), 2)));
-      return $g2;
+      if (($e1 != 0) and ($e2 != 0)) {
+      	$g2 = 2 * (($w1w2 * log(($w1w2 / $e1), 2)) + ($w2 * log(($w2 / $e2), 2)));
+      	return $g2;
+      }
+      else{
+      	return 0;
+      }
     }
+    
+    
+       ###
+      ###    MUTUAL INFORMATION
+     ###
+    function mi($x, $y, $xy, $tot){
+       if ($xy < 5){
+           return 0;
+       }
+       $nom = $xy / $tot;
+       $det = ($x / $tot) * ($y / $tot);
+       return  log(($non / $det), 2);
+    
+    }
+    
 
     ###
    ###     
@@ -260,18 +280,41 @@ byFrequency2();
   echo "<p>the ".$uni1['the'].'     '.$uni2['the']."</p>";
   echo "<p>Buddha ".$uni1['Buddha'].'     '.$uni2['Buddha']."</p>";
   echo "<p>Compassion ".$uni1['compassion'].'     '.$uni2['compassion']."</p>";
-  echo "<p>".ll($uni1['compassion'],$uni2['compassion'], $total1, $total2)."</p>";
+  echo "<p>".ll($uni2['compassion'], $total, $uni1['compassion'],  $total2)."</p>";
+  echo "<p>".ll($uni2['compassion'], $total, 0,  $total2)."</p>";
+  echo "<p>".ll($uni2['the'], $total, $uni1['the'],  $total2)."</p>";
   echo "<p>Total number of tokens: $total   &nbsp;&nbsp;&nbsp; Types: $len</p>";
-  arsort($ngrams, SORT_NUMERIC);
+  arsort($uni1, SORT_NUMERIC);
+    $len1 = count($uni1);
+
+    echo "<p>LEN $len1 $len2</p>";
+  # okay now compute log likelihood.
+  $log = array();
   echo "<table><tr><th>ngram</th><th>count</th><th>frequency</th></tr>\n";
-  foreach($ngrams as $gram =>$count){
-     if ($count < $cutoff){
+  foreach($uni1 as $gram =>$count){
+     if ($count < 4){
          break;
      }
-     $freq = ($count * 100) / $total;
-     echo "<tr><td>$gram</td><td>$count</td><td>$freq</td></tr>\n";
+     $c2 = $uni2[$gram];
+     if ($c2 != 0){
+     #echo '.';
+        $loglike = mi($c2, $total, $count, $total2);
+        #echo $loglike;
+        if ($loglike != 0){
+     	    $log[$gram] =$loglike;
+     	}
+     }
+  }
+  $c3 =  count($log);
+  echo "<p>LOG LEN $c3</p>";
+  arsort($log, SORT_NUMERIC);
+  foreach($log as $gram=>$val){
+      $count = $uni1[$gram];
+  
+      echo "<tr><td>$gram</td><td>$count</td><td>$val</td></tr>\n";
+    }
        
-   }
+   
        
       
        echo "</table>";
