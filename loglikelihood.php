@@ -31,4 +31,6 @@ function logLikelihoodRatio($k11, $k12, $k21, $k22){
 }
 
 #echo logLikelihoodRatio(150, 782, 12443, 14294293);
+
+#echo logLikelihoodRatio(276, 1002, 26036, 229785);
 ?>

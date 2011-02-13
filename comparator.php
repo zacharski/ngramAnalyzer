@@ -16,7 +16,9 @@
 <div id="container">
 	<div id="navigation">
 		<ul>
-		<li><a href="index.php">Home</a></li>
+				<li><a href="index.php">Ngram Analyzer</a></li>
+		<li><a href="comparator.php">Text Comparator</a></li>
+
 		<li><a href="http://guidetodatamining.com">Guide to Data Mining</a></li>
 		
 		</ul>
@@ -46,7 +48,7 @@
 					</div>
 				</div>
 <?php 
-include('bottom.html');
+include('bottom2.html');
 ?>
 
 </div>

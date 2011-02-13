@@ -16,7 +16,9 @@
 <div id="container">
 	<div id="navigation">
 		<ul>
-		<li><a href="index.php">Home</a></li>
+				<li><a href="index.php">Ngram Analyzer</a></li>
+		<li><a href="comparator.php">Text Comparator</a></li>
+
 		<li><a href="http://guidetodatamining.com">Guide to Data Mining</a></li>
 		
 		</ul>
@@ -45,6 +47,9 @@
         #####
        #####
 
+
+
+include('loglikelihood.php');
 
 $ngrams = array();
 #$ngrams['fo42haj'] = 0;
@@ -177,7 +182,10 @@ function deletePun($word){
           if (substr($thetext, 0, 4) == 'http') {
       		 $urls = preg_split('/\s+/', $thetext);
       		 foreach($urls as $url){
-      	    	processLine(file_get_contents($url));
+      		 	if (substr($url, 0, 4) == 'http') {
+      		 		#echo "<p>URL: $url</p>";
+      	    		processLine(file_get_contents($url));
+      	    	}
       	     }
           }
           else{
@@ -206,6 +214,7 @@ function deletePun($word){
           if (substr($reference, 0, 4) == 'http') {
       		 $urls = preg_split('/\s+/', $reference);
       		 foreach($urls as $url){
+      		    #echo "<p>$url</p>";
       	    	processLine2(file_get_contents($url));
       	     }
           }
@@ -255,9 +264,31 @@ function deletePun($word){
  ###
 ### 
 
-
-$thetext = $_POST['mytext'];
-$reference = $_POST['reference'];
+if (isset($_GET['ex'])) {
+    #$server = 'http://localhost/ngramAnalyzer';
+    $server = 'http://guidetodatamining.com/ngramAnalyzer';
+    $text = $_GET['ex'];
+    if ($text== 'walden'){
+    	
+    	$thetext = "$server/walden.txt";
+    	$reference = "$server/moby.txt";
+    }
+    elseif ($text== 'lotus'){
+    	
+    	$thetext = "$server/lotus.txt";
+    	$reference = "$server/walden.txt";
+    }
+    elseif ($text== 'lotus2'){
+    	
+    	$thetext = "$server/lotus.txt";
+    	$reference = "$server/moby.txt";
+    }
+}
+else {
+#echo "<p>EX</p>";
+	$thetext = $_POST['mytext'];
+	$reference = $_POST['reference'];
+}
 $total2 = 0;
 ##########
 ##  I am editing here
@@ -269,49 +300,60 @@ $total2 = 0;
 #echo $thetext;
 $uni1 = array();
 $uni2 = array();
+$dir = array();
 $total = 0;
+
 byFrequency();
 byFrequency2();
   $len1 = count($uni1);
   $len2 = count($uni2);
   
-  echo "<p>LEN $len1 $len2</p>";
-  echo "<p>TOTAL $total $total2</p>";
-  echo "<p>the ".$uni1['the'].'     '.$uni2['the']."</p>";
-  echo "<p>Buddha ".$uni1['Buddha'].'     '.$uni2['Buddha']."</p>";
-  echo "<p>Compassion ".$uni1['compassion'].'     '.$uni2['compassion']."</p>";
-  echo "<p>".ll($uni2['compassion'], $total, $uni1['compassion'],  $total2)."</p>";
-  echo "<p>".ll($uni2['compassion'], $total, 0,  $total2)."</p>";
-  echo "<p>".ll($uni2['the'], $total, $uni1['the'],  $total2)."</p>";
-  echo "<p>Total number of tokens: $total   &nbsp;&nbsp;&nbsp; Types: $len</p>";
+  #echo "<p>LEN $len1 $len2</p>";
+  // echo "<p>TOTAL $total $total2</p>";
+//   echo "<p>the ".$uni1['the'].'     '.$uni2['the']."</p>";
+//   echo "<p>Buddha ".$uni1['Buddha'].'     '.$uni2['Buddha']."</p>";
+//   echo "<p>Compassion ".$uni1['compassion'].'     '.$uni2['compassion']."</p>";
+//   echo "<p>".ll($uni2['compassion'], $total, $uni1['compassion'],  $total2)."</p>";
+//   echo "<p>".ll($uni2['compassion'], $total, 0,  $total2)."</p>";
+//   echo "<p>".ll($uni2['the'], $total, $uni1['the'],  $total2)."</p>";
+   echo "<p>Total number of tokens in first text: $total   &nbsp;&nbsp;&nbsp; In second: $total2</p>";
+   echo "<p>Count column refers to number of occurrences of the word in the first text. ";
+   echo "Log Likelihood in a black font indicates the word was used more frequently in the first corpus than in the second; red font indicates it was less frequently used.</p>";
   arsort($uni1, SORT_NUMERIC);
     $len1 = count($uni1);
 
-    echo "<p>LEN $len1 $len2</p>";
+    #echo "<p>LEN $len1 $len2</p>";
   # okay now compute log likelihood.
   $log = array();
-  echo "<table><tr><th>ngram</th><th>count</th><th>frequency</th></tr>\n";
+  echo "<table><tr><th>Word</th><th>Count</th><th>Log Likelihood</th></tr>\n";
   foreach($uni1 as $gram =>$count){
-     if ($count < 4){
+     if ($count < 6){
          break;
      }
      $c2 = $uni2[$gram];
      if ($c2 != 0){
      #echo '.';
-        $loglike = mi($c2, $total, $count, $total2);
+        $loglike = logLikelihoodRatio($count, $c2, $total - $count, $total2 - $c2);
         #echo $loglike;
         if ($loglike != 0){
      	    $log[$gram] =$loglike;
+     	    if (($count / $total) > ($c2 / $total2)){
+     	    	$dir[$gram] = '';
+     	    }
+     	    else{
+     	    	$dir[$gram] = 'neg';
+     	    }
      	}
      }
   }
   $c3 =  count($log);
-  echo "<p>LOG LEN $c3</p>";
+  #echo "<p>LOG LEN $c3</p>";
   arsort($log, SORT_NUMERIC);
   foreach($log as $gram=>$val){
       $count = $uni1[$gram];
-  
-      echo "<tr><td>$gram</td><td>$count</td><td>$val</td></tr>\n";
+  	  $direction = $dir[$gram];
+  	  #$direction = '+';
+      echo "<tr><td>$gram</td><td>$count</td><td class=\"$direction\"> $val</td></tr>\n";
     }
        
    
@@ -335,7 +377,7 @@ byFrequency2();
 				</div>
 				</div>
 <?php 
-include('bottom.html');
+include('bottom3.html');
 ?>
 </div>
 </body>
