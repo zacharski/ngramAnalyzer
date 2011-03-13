@@ -219,7 +219,7 @@ function deletePun($word){
       	     }
           }
           else{
-      	     processLine2($thetext);
+      	     processLine2($reference);
           }
        }
   
