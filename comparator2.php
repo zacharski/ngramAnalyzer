@@ -301,6 +301,7 @@ $total2 = 0;
 $uni1 = array();
 $uni2 = array();
 $dir = array();
+$cuny = array(); # used to indicate word not in reference corpus
 $total = 0;
 
 byFrequency();
@@ -318,25 +319,36 @@ byFrequency2();
 //   echo "<p>".ll($uni2['the'], $total, $uni1['the'],  $total2)."</p>";
    echo "<p>Total number of tokens in first text: $total   &nbsp;&nbsp;&nbsp; In second: $total2</p>";
    echo "<p>Count column refers to number of occurrences of the word in the first text. ";
-   echo "Log Likelihood in a black font indicates the word was used more frequently in the first corpus than in the second; red font indicates it was less frequently used.</p>";
+   echo "Log Likelihood in a black font indicates the word was used more frequently in the first corpus than in the second; red font indicates it was less frequently used. An asterisk indicates that the word does not appear in the second corpus.</p>";
   arsort($uni1, SORT_NUMERIC);
     $len1 = count($uni1);
 
     #echo "<p>LEN $len1 $len2</p>";
   # okay now compute log likelihood.
   $log = array();
+  #
+  #  ok. adding kludge here
+  if ($len1 < 2000){
+  		$limit = 4;
+  }
+  else {
+       $limit = 6;
+}
+  
   echo "<table><tr><th>Word</th><th>Count</th><th>Log Likelihood</th></tr>\n";
   foreach($uni1 as $gram =>$count){
-     if ($count < 6){
+     if ($count < $limit){
          break;
      }
      $c2 = $uni2[$gram];
      if ($c2 != 0){
      #echo '.';
         $loglike = logLikelihoodRatio($count, $c2, $total - $count, $total2 - $c2);
+        #$loglike = logLikelihoodRatio($count + 1, $c2 + 1, $total - $count, $total2 - $c2);
         #echo $loglike;
         if ($loglike != 0){
      	    $log[$gram] =$loglike;
+     	    $cuny[$gram] = '';
      	    if (($count / $total) > ($c2 / $total2)){
      	    	$dir[$gram] = '';
      	    }
@@ -344,6 +356,25 @@ byFrequency2();
      	    	$dir[$gram] = 'neg';
      	    }
      	}
+     	
+      	
+     	
+     	
+     	
+     	}
+     	elseif($total2 > 2) { # c2 is zero - word doesn't appear in reference corpus
+        #$loglike = logLikelihoodRatio($count, $c2, $total - $count, $total2 - $c2);
+        $loglike = logLikelihoodRatio($count + 1, $c2 + 1, $total - $count, $total2 - $c2);
+        #echo $loglike;
+        if ($loglike != 0){
+     	    $log[$gram] =$loglike;
+     	    $cuny[$gram] = '*';
+     	    if (($count / $total) > ($c2 / $total2)){
+     	    	$dir[$gram] = '';
+     	    }
+     	    else{
+     	    	$dir[$gram] = 'neg';
+     	    }}
      }
   }
   $c3 =  count($log);
@@ -352,8 +383,9 @@ byFrequency2();
   foreach($log as $gram=>$val){
       $count = $uni1[$gram];
   	  $direction = $dir[$gram];
+  	  $wordInRef = $cuny[$gram];
   	  #$direction = '+';
-      echo "<tr><td>$gram</td><td>$count</td><td class=\"$direction\"> $val</td></tr>\n";
+      echo "<tr><td>$gram</td><td>$count</td><td class=\"$direction\"> $val$wordInRef</td></tr>\n";
     }
        
    
